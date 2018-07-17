@@ -24,16 +24,18 @@ int frequency(string note)
   // ex.- 493.883301256 = 440*2^(2/12) rounding is needed
   // tested in google calc to have any number in N and got a right answer.
   int note=1
+
   if (note==1){
+      // up notes/octives
     int u=12;
     float uf=440*powf(2.0,(u/12.0));
     int frequ=round(uf);
 
 
 } else{
-
+    // down notes/octives
       int d=12;
-    float udf=440*powf(2.0,(d/12.0));
+    float udf=440/powf(2.0,(d/12.0));
     int frequ=round(df);
 }
     return frequ;
