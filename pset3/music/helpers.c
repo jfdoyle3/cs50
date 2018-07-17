@@ -1,7 +1,7 @@
 // Helper functions for music
 #include <math.h>
 #include <cs50.h>
-
+#include <stdio.h>
 #include "helpers.h"
 
 // Converts a fraction formatted as X/Y to eighths
@@ -23,8 +23,20 @@ int frequency(string note)
   // next octive: var= 880 * 2(n/12)
   // ex.- 493.883301256 = 440*2^(2/12) rounding is needed
   // tested in google calc to have any number in N and got a right answer.
-    int n=(int) note;
-    return n;
+  int note=1
+  if (note==1){
+    int u=12;
+    float uf=440*powf(2.0,(u/12.0));
+    int frequ=round(uf);
+
+
+} else{
+
+      int d=12;
+    float udf=440*powf(2.0,(d/12.0));
+    int frequ=round(df);
+}
+    return frequ;
 
 }
 
