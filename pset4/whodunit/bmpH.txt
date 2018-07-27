@@ -13,7 +13,7 @@ typedef uint16_t WORD;
 // https://msdn.microsoft.com/en-us/library/dd183374(v=vs.85).aspx
 typedef struct
 {
-    WORD bfType;
+    WORD bfType;     ======>  BM
     DWORD bfSize;
     WORD bfReserved1;
     WORD bfReserved2;
@@ -48,3 +48,9 @@ typedef struct
     BYTE rgbtRed;
 } __attribute__((__packed__))
 RGBTRIPLE;
+
+
+            BYTE        WORD        DWORD       LONG
+            ----        ----        -----       ----
+bYTES        1           2            4           4
+BITS                    16           32           32
