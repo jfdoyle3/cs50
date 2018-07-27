@@ -35,7 +35,7 @@ int main(int argc, string argv[]) {
         if(islower(strkey[kyidx])){
             key=(int) strkey[kyidx]-97;
         } else {
-             key=(int) strkey[kyidx]-65;
+            key=(int) strkey[kyidx]-65;
         }
 
        if (islower(plain_text[i]))
