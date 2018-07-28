@@ -42,7 +42,6 @@ int main(int argc, string argv[]) {
      {
           int lcipher=((text_num-97)+(key))%26;
           int clowltr='a'+ lcipher;
-      //  printf("----> %i\n",lcipher);
           printf("%c",clowltr);
             if (isalpha(strkey[kyidx+1])== false){
                 kyidx=0;
