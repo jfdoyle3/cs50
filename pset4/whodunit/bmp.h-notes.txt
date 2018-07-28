@@ -1,0 +1,142 @@
+          BYTE  |  WORD  |  DWORD  |  LONG
+BYTES     1     |    2   |    4    |    4
+BITS  >>---------->  16  |   32    |   32
+
+>>>>------------------>   bmp.h  <------------------------------<<<
+
+// BMP-related data types based on Microsoft's own
+
+#include <stdint.h>
+
+// aliases for C/C++ primitive data types
+// https://msdn.microsoft.com/en-us/library/cc230309.aspx
+typedef uint8_t  BYTE;
+typedef uint32_t DWORD;
+typedef int32_t  LONG;
+typedef uint16_t WORD;
+
+// information about the type, size, and layout of a file
+// https://msdn.microsoft.com/en-us/library/dd183374(v=vs.85).aspx
+typedef struct
+{
+    WORD bfType; 	     ======> must:	 BM
+    DWORD bfSize;    	= size of file in bytes: pixel/padding/headers
+			                Formula: bf.bfSize;  =bi.biSizeImage+
+                       					           sizeof(BITMAPFILEHEADER)+
+                       					           sizeof(BITMAPINFOHEADER);
+    WORD bfReserved1;   = zero
+    WORD bfReserved2;   = zero
+    DWORD bfOffBits;
+} __attribute__((__packed__))
+BITMAPFILEHEADER;
+
+// information about the dimensions and color format
+//
+typedef struct
+{
+    DWORD biSize;
+    LONG biWidth;   		= in pixels - does not include padding
+    LONG biHeight;.	    	= in pixels.
+    WORD biPlanes;
+    WORD biBitCount;
+    DWORD biCompression
+    DWORD biSizeImage;  	= image size in bytes: pixel& padding
+    LONG biXPelsPerMeter;
+    LONG biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;
+} __attribute__((__packed__))
+BITMAPINFOHEADER;
+
+
+
+// relative intensities of red, green, and blue
+// https://msdn.microsoft.com/en-us/library/dd162939(v=vs.85).aspx
+typedef struct
+{
+    BYTE rgbtBlue;
+    BYTE rgbtGreen;
+    BYTE rgbtRed;
+} __attribute__((__packed__))
+RGBTRIPLE;
+--------------------------------------------------------------------------
+Struct to represent pixels:
+
+A Green Pixel would be:
+RGBTRIPLE triple;
+triple.rgbtBlue= 0x00;
+triple.rgbtGreen=0xff;. - pure green
+triple.rgbtRed=0x00;
+
+Padding:
+  each pixel is 3 bytes
+  length of each scanline must be a multiple of 4 bytes
+  if number of pixes isn't a multiple of 4 we need "padding"/0x00
+  clue and verdict have the same width: padding should be the same.
+  --->  Padding isn't an RGBTRIPLE  : can't fread padding
+padding forumla: RGBTRIPLE will always 3 bytes. Width will be the same for both bmp
+	padding = (4 - ( bi.biWidth * sizeof (RGBTRIPLE)) % 4) % 4
+
+Writing padding to file:
+    fputc (chr, outptr);  chr = char to write, outptr = FILE * to write to FILE.EXT
+
+    fputc (0x00, outptr);   write padding
+
+ examples:
+      I have 4 RGBtriples  1= RGBtriple=0xff | 0xff | 0xff = 3 bytes    3 x 4 =12  : No Padding needed
+      I have 5 RGBtriples  1= RGBtriple=0xff | 0xff | 0xff = 3 bytes    3 x 5 =15  : Needs 1 byte of Padding/0x00
+      I have 6 RGBtriples  1= RGBtriple=0xff | 0xff | 0xff = 3 bytes    3 x 6 =18  : Needs 2 bytes of Padding/0x00
+      I have 3 RGBtriples  1= RGBtriple=0xff | 0xff | 0xff = 3 bytes    3 x 3 =  9  : Needs 3 bytes of Padding/0x00
+
+	|     RGBtriple      |    RGBtriple       |    RGBtriple       |      Padding       |
+	| 0xff | 0xff | 0xff | 0xff | 0xff | 0xff | 0xff | 0xff | 0xff | 0x00 | 0x00 | 0x00 |
+
+
+How to manipluate the color of pixels:
+example:
+triple.rgbtRed=0x00;
+triple.rgbtBlue=0xff;
+triple.rgbtGreen=0x00;
+
+if (triple.rgbtBlue==0xff)
+{
+	printf("I'm feeling blue!\n");
+}
+
+Reading file:
+fread (data,size, number,inptr)
+
+Data: pointer to a struct that will contain the bytes you're reading
+Size: size of each elemental to read : use sizeof();
+Number: number of elements to read
+Inptr: FILE * to read from FILE.EXT
+
+Writing file:
+fwrite(data,size, number,inptr)
+
+Data: pointer to a struct that will contain the bytes you're writing
+Size: size of each elemental to read : use sizeof();
+Number: number of elements to read
+Inptr: FILE * to write to FILE.EXT
+
+
+File position indicator:
+fseek(inptr, offset, from);
+
+Inptr: FILE * to seek over FILE.EXT
+ofset: number of bytes to move cursor
+from:
+	SEEK_CUR(current pos in file)
+	SEEK_SET(beginning of file)
+	SEEK_END(end of file)
+
+
+
+
+TODO:
+
+open file         				 open clue.bmp
+update header's info for outfile  	 update verdict.bmp
+read clue's scanline, pixel by pixel  	 scan clue.bmp
+change pixel's color as necessary    	 change pixels
+write verdict's scanline, pixel by pixel  write verdict.bmp
