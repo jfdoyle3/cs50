@@ -68,11 +68,18 @@ int main(int argc, char *argv[])
         // iterate over pixels in scanline
         for (int j = 0; j < bi.biWidth; j++)
         {
+
             // temporary storage
             RGBTRIPLE triple;
 
             // read RGB triple from infile
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+
+              if ( triple.rgbtRed==0xff && triple.rgbtBlue==0x00  && triple.rgbtGreen==0x00){
+              triple.rgbtRed=0xff;
+              triple.rgbtBlue=0xff;
+              triple.rgbtGreen=0xff;
+              }
 
             // write RGB triple to outfile
             fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
