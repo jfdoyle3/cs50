@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // read infile's BITMAPINFOHEADER
     BITMAPINFOHEADER bi;
     fread(&bi, sizeof(BITMAPINFOHEADER), 1, inptr);
-   // int inbi;
+
    // BITMAPINFOHEADER inbiw=bi.biWidth;
 
     // ensure infile is (likely) a 24-bit uncompressed BMP 4.0
