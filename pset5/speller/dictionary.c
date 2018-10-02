@@ -10,7 +10,7 @@
 struct node
 {
     bool end_string;
-    struct node *next_char[26];
+    struct node *ALPHABET[n];
 };
 typedef node *root;
 int wordCount=0;
