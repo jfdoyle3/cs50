@@ -5,6 +5,8 @@
 #include "dictionary.h"
 
 #define ALPHABET (26)
+#define CHAR_INDEX (int(c)-int('a'))
+
 
 
 struct node
@@ -13,6 +15,7 @@ struct node
     struct node *ALPHABET[n];
 };
 typedef node *root;
+
 int wordCount=0;
 // Returns true if word is in dictionary else false
 bool check(const char *word)
