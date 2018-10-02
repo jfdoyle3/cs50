@@ -1,8 +1,8 @@
 # compiler to use
-CC = clang
+CC ?= clang
 
 # flags to pass compiler
-CFLAGS = -fsanitize=signed-integer-overflow -fsanitize=undefined -ggdb3 -O0 -Qunused-arguments -std=c11 -Wall -Werror -Wextra -Wno-sign-compare -Wshadow
+CFLAGS ?= -fsanitize=signed-integer-overflow -fsanitize=undefined -ggdb3 -O0 -Qunused-arguments -std=c11 -Wall -Werror -Wextra -Wno-sign-compare -Wshadow
 
 # name for executable
 EXE = speller
@@ -23,7 +23,7 @@ OBJS = $(SRCS:.c=.o)
 
 # default target
 $(EXE): $(OBJS) $(HDRS) Makefile
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(SRCS) $(OBJS) $(LIBS)
 
 # dependencies
 $(OBJS): $(HDRS) Makefile
