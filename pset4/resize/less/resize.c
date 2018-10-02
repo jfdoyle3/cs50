@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     {
         fclose(inptr);
         fprintf(stderr, "Could not create %s.\n", outfile);
-        return 4;
+        return sizeof(BITMAPFILEHEADER);
     }
 
     // read infile's BITMAPFILEHEADER
@@ -48,8 +48,9 @@ int main(int argc, char *argv[])
     // read infile's BITMAPINFOHEADER
     BITMAPINFOHEADER bi;
     fread(&bi, sizeof(BITMAPINFOHEADER), 1, inptr);
-   // int inbi;
-   // BITMAPINFOHEADER inbiw=bi.biWidth;
+
+
+
 
     // ensure infile is (likely) a 24-bit uncompressed BMP 4.0
     if (bf.bfType != 0x4d42 || bf.bfOffBits != 54 || bi.biSize != 40 ||
@@ -60,59 +61,71 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unsupported file format.\n");
         return 4;
     }
-     BITMAPINFOHEADER biout=bi;
-     BITMAPFILEHEADER bfout=bf;
+    BITMAPFILEHEADER bfout=bf;
+    BITMAPINFOHEADER biout=bi;
+   int inWidth=bi.biWidth;
+   int inHeight=abs(bi.biHeight);
     int factor=atoi(size);
-     int inpadding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int inpadding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
    // int inwidth=bi.biWidth*size;
    // int inHeight=abs(bi.biHeight)
 
+    biout.biWidth *= factor;
+    biout.biHeight *= factor;
+  printf("\ninpadding= %i inWidth= %i    inHeight= %i   size=%i\n",inpadding,inWidth,inHeight,factor);
+   // int outWidth = biout.biWidth*factor;
+    int outpadding = (4 - ( biout.biWidth* sizeof(RGBTRIPLE)) % 4) % 4;
+   // int outHeight=abs(biout.biHeight)*factor;
 
-    printf("\ninpadding= %i inWidth= %i    inHeight= %i   size=%i\n",inpadding,bi.biWidth,bi.biHeight,factor);
-  int outWidth = biout.biWidth*factor;
-     int outpadding = (4 - (outWidth * sizeof(RGBTRIPLE)) % 4) % 4;
-biout.biSizeImage=(biout.biWidth*sizeof(RGBTRIPLE)+outpadding)*(biout.biHeight*sizeof(RGBTRIPLE));
+    biout.biSizeImage=(biout.biWidth*sizeof(RGBTRIPLE)+outpadding)*(biout.biHeight*sizeof(RGBTRIPLE));
   //  biout.biSizeImage = ((3 * outWidth) + outpadding) * abs(bi.biHeight);
     bfout.bfSize =biout.biSizeImage+sizeof(bfout)+ sizeof(biout);
+  //  biout.biSizeImage = abs(biout.biHeight) * (biout.biWidth * sizeof(RGBTRIPLE) + outpadding);
+  //   bfout.bfSize = (biout.biSizeImage + 54);
     // write outfile's BITMAPFILEHEADER
-    fwrite(&bfout, sizeof(bfout), 1, outptr);
+    fwrite(&bfout, sizeof(BITMAPFILEHEADER), 1, outptr);
 
     // write outfile's BITMAPINFOHEADER
   //  bi.biHeight=abs(bi.biHeight)*size;
-    fwrite(&biout, sizeof(biout), 1, outptr);
+    fwrite(&biout, sizeof(BITMAPINFOHEADER), 1, outptr);
 
     // determine padding for scanlines
+   //  int outWidth = bi.biWidth*factor;
+   //  int outpadding = (4 - (outWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
 
-
-    int outHeight=abs(biout.biHeight)*factor;
-    printf("outpadding= %i  outwidth= %i  outhieght=%i\n",outpadding,outWidth,outHeight);
+   // int outHeight=abs(bi.biHeight)*factor;
+    printf("outpadding= %i  outwidth= %i  outheight=%i\n",outpadding,biout.biWidth,biout.biHeight);
     // iterate over infile's scanlines
-    for (int i = 0, biHeight = abs(bi.biHeight); i <= biHeight*factor; i++)
+   // for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
+     for (int i = 0; i <inHeight; i++)
     {
-        // iterate over pixels in scanline
-        for (int j = 0; j <= bi.biWidth; j++)
 
-
-
+        for (int o=0; o<biout.biHeight*factor+(biout.biHeight*factor%2); o++)
+{
+   //     for (int o=0; o<factor; o++)
         {
-
+        // iterate over pixels in scanline
+     //   for (int j = 0; j < bi.biWidth; j++)
+      for (int j = 0; j < inWidth; j++)
+        {
             // temporary storage
             RGBTRIPLE triple;
 
+
+
             // read RGB triple from infile
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
-
- //  for (int r=0; r<=factor; r++)
-//{
+//
 
 
             // write RGB triple to outfile
-  for (int l=0; l<=factor; l++)
+     //   for (int r=0; r<biout.biWidth; r++)
+         for (int r=0; r<biout.biWidth*factor+(biout.biWidth*factor%2); r++)
         {
-
-
             fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+
 
         // skip over padding, if any
         fseek(inptr, inpadding, SEEK_CUR);
@@ -122,10 +135,12 @@ biout.biSizeImage=(biout.biWidth*sizeof(RGBTRIPLE)+outpadding)*(biout.biHeight*s
         {
             fputc(0x00, outptr);
         }
-        }
-        }
     }
-//    }
+}
+}
+        }
+}
+
     // close infile
     fclose(inptr);
 
