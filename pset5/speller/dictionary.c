@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include "dictionary.h"
 
+#define ALPHABET (26)
+
+
 struct node
 {
     bool end_string;
